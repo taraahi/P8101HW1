@@ -1,0 +1,254 @@
+---
+title: "Homework 1"
+author: "Tara Ahi"
+date: "01/29/2022"
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE) # no need to change these options
+library(tidyverse)
+library(readxl)
+```
+
+## Question 0
+
+##### a) 
+
+Add your name and the date to the header of the rmd.  
+
+##### b) 
+
+Add a floating table of contents to the HTML document. Check out the YAML header from previous files for an example of how to do this.
+
+## Question 1 
+
+The US Measles dataset contains yearly reports of measles prevalences in the US. The variables are: year, state, and prevalence.
+
+##### a) 
+
+Read in the US Measles dataset (`us_measles.csv`). 
+
+```{r}
+us_measles <- read_csv("data/us_measles.csv")
+```
+
+##### b) 
+
+Create a histogram of measles prevalence and comment on the shape of the distribution. 
+
+```{r}
+ggplot(data = us_measles) +
+  geom_histogram(aes(x = prevalence), bins = 50)
+#The shape is right-skewed
+```
+
+
+##### c) 
+
+Calculate the mean and standard deviation of measles prevalence for years 1940 and 1990. Interpret these values in context. 
+
+```{r}
+library(gapminder)
+
+prev_1940 <- us_measles %>%
+  filter(year == "1940") %>%
+  pull(prevalence) 
+
+prev_mean_1940 <- mean(prev_1940)
+#0.002651914
+prev_sd_1940 <- sd(prev_1940)
+#0.002653625
+```
+
+The mean prevalence of measles in 1940 is `r prev_mean_1940` with a standard deviation of `r prev_sd_1940`.
+
+```{r}
+prev_1990 <- us_measles %>%
+  filter(year == "1990") %>%
+  pull(prevalence) 
+
+prev_mean_1990 <- mean(prev_1990)
+#4.61908e-05
+prev_sd_1990 <- sd(prev_1990)
+#6.031689e-05
+```
+
+The mean prevalence of measles in 1990 is `r prev_mean_1990` with a standard deviation of `r prev_sd_1990`.
+
+##### d)
+
+Create a scatterplot for measles prevalence by year in New York, and set all the points to the color of your choice (black isn't allowed). Report in a sentence one pattern you notice with measles prevalence over time in New York.
+
+```{r}
+ny_measles <- us_measles %>% 
+  filter(state == "New York")
+
+ggplot(data = ny_measles) +
+  geom_point(aes(x = year, y = prevalence), color = "violet")
+```
+
+Prevalence of measles in New York declined over the years with a sharp drop in the late 60s. 
+
+##### e)
+
+Create a scatterplot for measles prevalence by year in another state of your choice (let us know in writing which state you chose), and set the points to the color of your choice (black isn't allowed). How does this graph compare to the graph of New York's prevalence by year?
+
+```{r}
+ca_measles <- us_measles %>% 
+  filter(state == "California")
+
+ggplot(data = ca_measles) +
+  geom_point(aes(x = year, y = prevalence), color = "turquoise")
+```
+
+I chose California, which had a higher measles prevalence overall compared to New York but also saw a sharp drop in the late 60s.
+
+## Question 2 
+
+The Tooth Growth dataset contains the results of an experiment conducted on 60 Guinea Pigs to evaluate the effect of vitamin C supplements on tooth growth. The variables are: Length (tooth length in cm), Supplement (supplement type, either VC-ascorbic acid or OJ-orange juice), and Dose (in milligrams/day).
+
+
+##### a) 
+
+Read in Tooth Growth data (`ToothGrowth.csv`). Check the data carefully...
+
+```{r}
+tooth_growth <- read_csv("data/ToothGrowth.csv", skip = 2)
+```
+
+##### b) 
+
+How many variables and observations are in this dataset? What is each variable's type? 
+
+Note: This can be determined without code by using the RStudio Viewer. The functions `nrow()` and `ncol()` may also be useful for this question. 
+
+**There are `r ncol(tooth_growth)` variables and `r nrow(tooth_growth)*ncol(tooth_growth)` observations in this dataset. They are all characters.**
+
+```{r}
+summary(tooth_growth)
+#just checking
+```
+
+##### c) 
+
+Calculate the mean and standard deviation of tooth length for each dosage and report them using in-line R code.
+
+```{r}
+
+## The code below pulls a vector of tooth lengths for the 0.5 Dose. You can alter this code to pull vectors of the tooth lengths for the other dosages -- you just need to change the "DATA" to the dataframe object you loaded in.
+
+length_dose_05 <- tooth_growth %>% 
+  filter(Dose == 0.5) %>%
+  pull(Length)
+
+mean(length_dose_05)
+sd(length_dose_05)
+```
+
+**The mean tooth length for the 0.5 dosage is `r mean(length_dose_05)` with a standard deviation of `r sd(length_dose_05)`.**
+
+```{r}
+length_dose_1 <- tooth_growth %>% 
+  filter(Dose == 1) %>%
+  pull(Length)
+
+mean(length_dose_1)
+sd(length_dose_1)
+```
+
+**The mean tooth length for the 1 dosage is `r mean(length_dose_1)` with a standard deviation of `r sd(length_dose_1)`.**
+
+```{r}
+length_dose_2 <- tooth_growth %>% 
+  filter(Dose == 2) %>%
+  pull(Length)
+
+mean(length_dose_2)
+sd(length_dose_2)
+```
+
+**The mean tooth length for the 2 dosage is `r mean(length_dose_2)` with a standard deviation of `r sd(length_dose_2)`.**
+
+##### d) 
+
+Make a boxplot for tooth length based on supplement. Comment on the distribution, and any observed differences you see between OJ and VC supplement groups.
+
+```{r}
+ggplot(data = tooth_growth) +
+  geom_boxplot(aes(x = Supplement, y = Length))
+```
+
+**The VC supplement sees a wider distribution with a lower mean tooth length compared to the OJ supplement.**
+
+## Question 3 
+ 
+The Murders dataset contains information on murder rates in the US in 2012. The variables are: state, region, population (number of residents in the region), and total_murders (number of murders in the region).
+ 
+##### a) 
+
+The code below attempts to read in the murders dataset but requires additional options to read in the data correctly. Take a look at the data file and check the data carefully after you read it in... 
+ 
+```{r}
+library(readxl)
+
+murders = read_excel("data/murders.xlsx", sheet = 2, range = "E5:H56")
+
+```
+
+##### b) 
+
+How many variables and observations are in this dataset? What is each variable's type? 
+
+**There are `r ncol(murders)` variables and `r nrow(murders)*ncol(murders)` observations in this dataset. State and region are character variables while population and total murders are doubles.**
+
+##### c) 
+
+The following code creates a histogram of the total murders, yet contains four errors. Identify and correct each error, and describe what was wrong below the graph. Once you have fixed all errors, be sure to remove `eval = FALSE` from the code chunk options so that the code will run. 
+
+```{r}
+ggplot(data = murders) +
+  geom_histogram(aes(x = total_murders), bins = 50) +  
+  labs(title = "Histogram of Murders", x = "total murders")
+```
+
+**Errors:**
+
+* the data is spelled murder instead of murders and "cities" is not a variable
+
+* the code is missing `aes` 
+
+* the code used %>% instead of +
+
+* the x axis should be labeled "total murders" not "cities"
+
+##### d)
+
+The following code attempts to visualize total murders by population and region, with each region displayed in a different color -- but there are four errors. Find and correct each, and describe what was wrong below the graph. Once you have fixed all errors, be sure to remove `eval = FALSE` from the code chunk options. 
+
+```{r eval}
+
+ggplot(data = murders) +
+  geom_point(aes(y = population, x = total_murders, color = region)) +
+  labs(title = "Murders by Population and Region", x = "region", y = "population")
+
+```
+
+**Errors:**
+
+* it should be `geom_point` not `geom_scatter`
+
+* there is a typo in totalmurders, it should be total_murders
+
+* `color = region` should be inside aes
+
+* x should be _region_ while y should be _population_
+
+## Submission Instructions
+
+When you are finished with this homework, Knit it to HTML and then submit both your .rmd and .html files to courseworks.
+
